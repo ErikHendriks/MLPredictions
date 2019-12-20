@@ -18,6 +18,7 @@ class TradeTools(object):
         api.request(ot)
         for i in range(0,len(ot.response['trades'])-1):
             tc = trades.TradeClose(accountID=accountID, tradeID=ot.response['trades'][i]['id'])
+            api.request(tc)
 #           print(api.request(tc))
 
     def marketOrder(accountID, api, symbol, units, takeProfit, stopLoss):
