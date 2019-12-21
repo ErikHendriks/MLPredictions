@@ -70,7 +70,8 @@ for symbol in symbols:
                     takeProfit = round(price + (atr/2),5)
 
                 response = TradeTools.marketOrder(accountID, api, symbol, 1, takeProfit, stopLoss)
-                textList.append('buy  ',symbol)
+                textList.append('buy')
+                textList.append(symbol)
                 textList.append(response)
                 textList.append(' ')
 
@@ -103,7 +104,8 @@ for symbol in symbols:
                     takeProfit = round(price - (atr/2),5)
 
                 response = TradeTools.marketOrder(accountID, api, symbol, -1, takeProfit, stopLoss)
-                textList.append('sell ',symbol)
+                textList.append('sell')
+                textList.append(symbol)
                 textList.append(response)
                 textList.append(' ')
 
