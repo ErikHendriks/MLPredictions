@@ -10,27 +10,22 @@ from tradeTools import TradeTools
 from sendInfo import sendEmail
 
 logging.basicConfig(
-    filename='/var/log/metalsPrediction.log',
+    filename='/var/log/currenciesPrediction.log',
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s] %(name)s : %(message)s',)
 
-conf = [line.strip('\n') for line in open('/etc/oandaV20/metalsPrediction.conf')]
+conf = [line.strip('\n') for line in open('/etc/oandaV20/currenciesPrediction.conf')]
 accountID = conf[0]
 api = API(access_token = conf[1], environment = conf[2])
 
 TradeTools.closeTrades(accountID,api)
 
 textList = []
-textList.append('Oanda v20 metals rapport at '+str(datetime.datetime.now()))
+textList.append('Oanda v20 currencies rapport at '+str(datetime.datetime.now()))
 textList.append(' ')
 
-symbols = ['XAG_AUD', 'XAG_CAD', 'XAG_CHF', 'XAG_EUR', 'XAG_GBP', 'XAG_HKD', 'XAG_JPY', 'XAG_NZD', 'XAG_SGD', 'XAG_USD', 'XAU_AUD', 'XAU_CAD', 'XAU_CHF', 'XAU_EUR', 'XAU_GBP', 'XAU_HKD', 'XAU_JPY', 'XAU_NZD', 'XAU_SGD', 'XAU_USD', 'XAU_XAG', 'XCU_USD', 'XPD_USD', 'XPT_USD']
-ohlcd = {'count': 208,'granularity': 'W'}
-
-dec0 = ['XAU_JPY']
-dec1 = ['XAG_JPY']
-dec3 = ['XAU_AUD','XAU_CAD','XAU_CHF','XAU_EUR','XAU_GBP','XAU_HKD','XAU_NZD','XAU_SGD','XAU_USD','XAU_XAG','XPD_USD','XPT_USD','XAG_HKD','']
-dec5 = ['XAG_EUR','XCU_USD','XAG_USD','XAG_SGD','XAG_NZD','XAG_HKD','XAG_GBP','XAG_CHF','XAG_CAD','XAG_AUD']
+symbols = ['AUD_CAD', 'AUD_CHF', 'AUD_HKD', 'AUD_JPY', 'AUD_NZD', 'AUD_SGD', 'AUD_USD', 'CAD_CHF', 'CAD_HKD', 'CAD_JPY', 'CAD_SGD', 'CHF_HKD', 'CHF_JPY', 'CHF_ZAR', 'EUR_AUD', 'EUR_CAD', 'EUR_CHF', 'EUR_CZK', 'EUR_DKK', 'EUR_GBP', 'EUR_HKD', 'EUR_HUF', 'EUR_JPY', 'EUR_NOK', 'EUR_NZD', 'EUR_PLN', 'EUR_SEK', 'EUR_SGD', 'EUR_TRY', 'EUR_USD', 'EUR_ZAR', 'FR40_EUR', 'GBP_AUD', 'GBP_CAD', 'GBP_CHF', 'GBP_HKD', 'GBP_JPY', 'GBP_NZD', 'GBP_PLN', 'GBP_SGD', 'GBP_USD', 'GBP_ZAR', 'HKD_JPY', 'NZD_CAD', 'NZD_CHF', 'NZD_HKD', 'NZD_JPY', 'NZD_SGD', 'NZD_USD', 'SGD_CHF', 'SGD_HKD', 'SGD_JPY', 'TRY_JPY', 'USD_CAD', 'USD_CHF', 'USD_CNH', 'USD_CZK', 'USD_DKK', 'USD_HKD', 'USD_HUF', 'USD_INR', 'USD_JPY', 'USD_MXN', 'USD_NOK', 'USD_PLN', 'USD_SAR', 'USD_SEK', 'USD_SGD', 'USD_THB', 'USD_TRY', 'USD_ZAR', 'ZAR_JPY']
+ohlcd = {'count': 730,'granularity': 'D'}
 
 for symbol in symbols:
 #   r = MLAlgorithms.lstm(symbol, ohlcd, api, 1)
@@ -53,15 +48,10 @@ for symbol in symbols:
             and buyRule2[0] is True:
                 atr = float(atr)
 
-                if symbol in dec0:
-                    stopLoss = round(price - (atr/2),0)
-                    takeProfit = round(price + (atr/2),0)
-
-                elif symbol in dec1:
-                    stopLoss = round(price - (atr/2),1)
-                    takeProfit = round(price + (atr/2),1)
-
-                elif symbol in dec3:
+                if 'JPY' in symbol\
+                or 'INR' in symbol\
+                or 'THB' in symbol\
+                or 'HUF' in symbol:
                     stopLoss = round(price - (atr/2),3)
                     takeProfit = round(price + (atr/2),3)
 
@@ -69,8 +59,9 @@ for symbol in symbols:
                     stopLoss = round(price - (atr/2),5)
                     takeProfit = round(price + (atr/2),5)
 
-                response = TradeTools.marketOrder(accountID, api, symbol, 1, takeProfit, stopLoss)
-                textList.append('buy  ',symbol)
+                response = TradeTools.marketOrder(accountID, api, symbol, 1000, takeProfit, stopLoss)
+                textList.append('buy')
+                textList.append(symbol)
                 textList.append(response)
                 textList.append(' ')
 
@@ -86,15 +77,10 @@ for symbol in symbols:
             and sellRule2[0] is True:
                 atr = float(atr)
 
-                if symbol in dec0:
-                    stopLoss = round(price + (atr/2),0)
-                    takeProfit = round(price - (atr/2),0)
-
-                elif symbol in dec1:
-                    stopLoss = round(price + (atr/2),1)
-                    takeProfit = round(price - (atr/2),1)
-
-                elif symbol in dec3:
+                if 'JPY' in symbol\
+                or 'INR' in symbol\
+                or 'THB' in symbol\
+                or 'HUF' in symbol:
                     stopLoss = round(price + (atr/2),3)
                     takeProfit = round(price - (atr/2),3)
 
@@ -102,13 +88,14 @@ for symbol in symbols:
                     stopLoss = round(price + (atr/2),5)
                     takeProfit = round(price - (atr/2),5)
 
-                response = TradeTools.marketOrder(accountID, api, symbol, -1, takeProfit, stopLoss)
-                textList.append('sell ',symbol)
+                response = TradeTools.marketOrder(accountID, api, symbol, -1000, takeProfit, stopLoss)
+                textList.append('sell')
+                textList.append(symbol)
                 textList.append(response)
                 textList.append(' ')
 
 text = '\n'.join(map(str,textList))
-subject = 'Weekly rapport metals at '+str(datetime.datetime.now())
+subject = 'Weekly rapport currencies at '+str(datetime.datetime.now())
 sendEmail(text,subject)
 
 
